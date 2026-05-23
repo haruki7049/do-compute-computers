@@ -32,12 +32,15 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
+
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
+
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
+
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
