@@ -2,6 +2,7 @@ const std = @import("std");
 const lightmix = @import("lightmix");
 
 const Sawtooth = @import("./sawtooth.zig");
+const PinkNoise = @import("./pink-noise.zig");
 const Scale = @import("./scale.zig");
 const Splitter = @import("./splitter.zig");
 const Filters = @import("./filters.zig");
@@ -10,44 +11,67 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     const bpm = 180;
     const sample_rate = 44100;
     const channels = 1;
-    const volume: f64 = 0.25;
+    const volume: f64 = 1.0;
 
-    var _4_4_c2_sawtooth = try Sawtooth.gen(
+    var c2_sawtooth = try Sawtooth.gen(
         f64,
         allocator,
         spb(bpm, sample_rate) / 6,
         Scale.gen(.{ .code = .c, .octave = 2 }),
         sample_rate,
         channels,
-        volume,
+        volume * 0.25,
     );
-    try _4_4_c2_sawtooth.filter(Filters.decay);
-    defer _4_4_c2_sawtooth.deinit();
+    try c2_sawtooth.filter(Filters.decay);
+    defer c2_sawtooth.deinit();
 
-    return try Splitter.gen(
+    var pinkNoise = try PinkNoise.gen(
         f64,
         allocator,
-        spb(bpm, sample_rate) * 8,
+        spb(bpm, sample_rate),
+        sample_rate,
+        channels,
+        volume * 0.125,
+    );
+    try pinkNoise.filter(Filters.decay);
+    try pinkNoise.filter(Filters.decay);
+    defer pinkNoise.deinit();
+
+    const snares = try Splitter.gen(
+        f64,
+        allocator,
+        spb(bpm, sample_rate) * 16,
         &.{
-            _4_4_c2_sawtooth,
-            _4_4_c2_sawtooth,
-            _4_4_c2_sawtooth,
+            c2_sawtooth,
+            pinkNoise,
+            c2_sawtooth,
+            pinkNoise,
+            c2_sawtooth,
+            pinkNoise,
+            c2_sawtooth,
+            pinkNoise,
 
-            _4_4_c2_sawtooth,
-            _4_4_c2_sawtooth,
-            _4_4_c2_sawtooth,
-
-            _4_4_c2_sawtooth,
-            _4_4_c2_sawtooth,
-            _4_4_c2_sawtooth,
-
-            _4_4_c2_sawtooth,
-            _4_4_c2_sawtooth,
-            _4_4_c2_sawtooth,
+            c2_sawtooth,
+            pinkNoise,
+            c2_sawtooth,
+            pinkNoise,
+            c2_sawtooth,
+            pinkNoise,
+            c2_sawtooth,
+            pinkNoise,
         },
         sample_rate,
         channels,
     );
+    defer snares.deinit();
+
+    var composer = lightmix.Composer(f64).init(allocator, .{ .channels = channels, .sample_rate = sample_rate });
+    defer composer.deinit();
+    // try composer.append(.{ .wave = kicks, .start_point = 0 });
+    // try composer.append(.{ .wave = kicks, .start_point = spb(bpm, sample_rate) * 16 });
+    try composer.append(.{ .wave = snares, .start_point = spb(bpm, sample_rate) * 16 });
+
+    return try composer.finalize(.{});
 }
 
 fn spb(bpm: usize, sample_rate: u32) usize {
