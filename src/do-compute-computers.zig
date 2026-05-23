@@ -14,7 +14,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     var _4_4_c2_sawtooth = try Sawtooth.gen(
         f64,
         allocator,
-        spb(120, sample_rate) / 9,
+        spb(120, sample_rate) / 6,
         Scale.gen(.{ .code = .c, .octave = 2 }),
         sample_rate,
         channels,
@@ -26,7 +26,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     return try Splitter.gen(
         f64,
         allocator,
-        spb(120, sample_rate) * 4,
+        spb(120, sample_rate) * 8,
         &.{
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
