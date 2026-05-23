@@ -7,6 +7,7 @@ const Splitter = @import("./splitter.zig");
 const Filters = @import("./filters.zig");
 
 pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
+    const bpm = 120;
     const sample_rate = 44100;
     const channels = 1;
     const volume: f64 = 0.25;
@@ -14,7 +15,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     var _4_4_c2_sawtooth = try Sawtooth.gen(
         f64,
         allocator,
-        spb(120, sample_rate) / 6,
+        spb(bpm, sample_rate) / 6,
         Scale.gen(.{ .code = .c, .octave = 2 }),
         sample_rate,
         channels,
@@ -26,7 +27,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     return try Splitter.gen(
         f64,
         allocator,
-        spb(120, sample_rate) * 8,
+        spb(bpm, sample_rate) * 8,
         &.{
             _4_4_c2_sawtooth,
             _4_4_c2_sawtooth,
