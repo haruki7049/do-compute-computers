@@ -37,7 +37,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     try pinkNoise.filter(Filters.decay);
     defer pinkNoise.deinit();
 
-    const snares = try Splitter.gen(
+    const drums = try Splitter.gen(
         f64,
         allocator,
         spb(bpm, sample_rate) * 16,
@@ -63,13 +63,11 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         sample_rate,
         channels,
     );
-    defer snares.deinit();
+    defer drums.deinit();
 
     var composer = lightmix.Composer(f64).init(allocator, .{ .channels = channels, .sample_rate = sample_rate });
     defer composer.deinit();
-    // try composer.append(.{ .wave = kicks, .start_point = 0 });
-    // try composer.append(.{ .wave = kicks, .start_point = spb(bpm, sample_rate) * 16 });
-    try composer.append(.{ .wave = snares, .start_point = spb(bpm, sample_rate) * 16 });
+    try composer.append(.{ .wave = drums, .start_point = spb(bpm, sample_rate) * 0 });
 
     return try composer.finalize(.{});
 }
