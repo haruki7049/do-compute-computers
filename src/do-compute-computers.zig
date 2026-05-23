@@ -11,33 +11,38 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     const channels = 1;
     const volume: f64 = 0.25;
 
-    var _4_4_c3_sawtooth = try Sawtooth.gen(
+    var _4_4_c2_sawtooth = try Sawtooth.gen(
         f64,
         allocator,
-        sample_rate / 9,
-        Scale.gen(.{ .code = .c, .octave = 3 }),
+        spb(120, sample_rate) / 9,
+        Scale.gen(.{ .code = .c, .octave = 2 }),
         sample_rate,
         channels,
         volume,
     );
-    try _4_4_c3_sawtooth.filter(Filters.decay);
-    defer _4_4_c3_sawtooth.deinit();
+    try _4_4_c2_sawtooth.filter(Filters.decay);
+    defer _4_4_c2_sawtooth.deinit();
 
     return try Splitter.gen(
         f64,
         allocator,
-        sample_rate * 4,
+        spb(120, sample_rate) * 4,
         &.{
-            _4_4_c3_sawtooth,
-            _4_4_c3_sawtooth,
-            _4_4_c3_sawtooth,
-            _4_4_c3_sawtooth,
-            _4_4_c3_sawtooth,
-            _4_4_c3_sawtooth,
-            _4_4_c3_sawtooth,
-            _4_4_c3_sawtooth,
+            _4_4_c2_sawtooth,
+            _4_4_c2_sawtooth,
+            _4_4_c2_sawtooth,
+            _4_4_c2_sawtooth,
+            _4_4_c2_sawtooth,
+            _4_4_c2_sawtooth,
+            _4_4_c2_sawtooth,
+            _4_4_c2_sawtooth,
         },
         sample_rate,
         channels,
     );
+}
+
+fn spb(bpm: usize, sample_rate: u32) usize {
+    const samples_per_beat: usize = @intFromFloat(@as(f32, @floatFromInt(60)) / @as(f32, @floatFromInt(bpm)) * @as(f32, @floatFromInt(sample_rate)));
+    return samples_per_beat;
 }
