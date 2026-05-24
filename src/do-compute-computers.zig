@@ -184,7 +184,9 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     }
     try composer.append(.{ .wave = c3_major, .start_point = spb(bpm, sample_rate) * 64 });
 
-    return try composer.finalize(.{});
+    var result = try composer.finalize(.{});
+    try result.filter(Filters.normalize);
+    return result;
 }
 
 fn gen_minor(
