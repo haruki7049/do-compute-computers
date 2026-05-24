@@ -37,6 +37,17 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
     try pinkNoise.filter(Filters.decay);
     defer pinkNoise.deinit();
 
+    const b2_melody = try gen_melody(
+        f64,
+        allocator,
+        spb(bpm, sample_rate) * 2,
+        .{ .code = .b, .octave = 2 },
+        sample_rate,
+        channels,
+        0.125,
+    );
+    defer b2_melody.deinit();
+
     const c3_melody = try gen_melody(
         f64,
         allocator,
@@ -47,6 +58,18 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         0.125,
     );
     defer c3_melody.deinit();
+
+    var c3_melody_decayed = try gen_melody(
+        f64,
+        allocator,
+        spb(bpm, sample_rate) * 2,
+        .{ .code = .c, .octave = 3 },
+        sample_rate,
+        channels,
+        0.125,
+    );
+    try c3_melody_decayed.filter(Filters.decay);
+    defer c3_melody_decayed.deinit();
 
     const d3_melody = try gen_melody(
         f64,
@@ -69,6 +92,17 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         0.125,
     );
     defer e3_melody.deinit();
+
+    const g3_melody = try gen_melody(
+        f64,
+        allocator,
+        spb(bpm, sample_rate) * 2,
+        .{ .code = .g, .octave = 3 },
+        sample_rate,
+        channels,
+        0.125,
+    );
+    defer g3_melody.deinit();
 
     const drums = try Splitter.gen(
         f64,
@@ -116,24 +150,28 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
 
     var composer = lightmix.Composer(f64).init(allocator, .{ .channels = channels, .sample_rate = sample_rate });
     defer composer.deinit();
-    try composer.append(.{ .wave = drums, .start_point = spb(bpm, sample_rate) * 0 });
-    try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * 0 });
-    try composer.append(.{ .wave = e3_melody, .start_point = spb(bpm, sample_rate) * 2 });
-    try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * 4 });
-    try composer.append(.{ .wave = d3_melody, .start_point = spb(bpm, sample_rate) * 6 });
-    try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * 8 });
-    try composer.append(.{ .wave = e3_melody, .start_point = spb(bpm, sample_rate) * 10 });
-    try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * 12 });
-    try composer.append(.{ .wave = d3_melody, .start_point = spb(bpm, sample_rate) * 14 });
-    try composer.append(.{ .wave = drums, .start_point = spb(bpm, sample_rate) * 16 });
-    try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * 16 });
-    try composer.append(.{ .wave = e3_melody, .start_point = spb(bpm, sample_rate) * 18 });
-    try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * 20 });
-    try composer.append(.{ .wave = d3_melody, .start_point = spb(bpm, sample_rate) * 22 });
-    try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * 24 });
-    try composer.append(.{ .wave = e3_melody, .start_point = spb(bpm, sample_rate) * 26 });
-    try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * 28 });
-    try composer.append(.{ .wave = d3_melody, .start_point = spb(bpm, sample_rate) * 30 });
+
+    for (0..4) |i| {
+        try composer.append(.{ .wave = drums, .start_point = spb(bpm, sample_rate) * i * 16 });
+    }
+    for (0..2) |i| {
+        try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * (0 + i * 32) });
+        try composer.append(.{ .wave = e3_melody, .start_point = spb(bpm, sample_rate) * (2 + i * 32) });
+        try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * (4 + i * 32) });
+        try composer.append(.{ .wave = d3_melody, .start_point = spb(bpm, sample_rate) * (6 + i * 32) });
+        try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * (8 + i * 32) });
+        try composer.append(.{ .wave = e3_melody, .start_point = spb(bpm, sample_rate) * (10 + i * 32) });
+        try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * (12 + i * 32) });
+        try composer.append(.{ .wave = d3_melody, .start_point = spb(bpm, sample_rate) * (14 + i * 32) });
+        try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * (16 + i * 32) });
+        try composer.append(.{ .wave = e3_melody, .start_point = spb(bpm, sample_rate) * (18 + i * 32) });
+        try composer.append(.{ .wave = g3_melody, .start_point = spb(bpm, sample_rate) * (20 + i * 32) });
+        try composer.append(.{ .wave = d3_melody, .start_point = spb(bpm, sample_rate) * (22 + i * 32) });
+        try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * (24 + i * 32) });
+        try composer.append(.{ .wave = b2_melody, .start_point = spb(bpm, sample_rate) * (26 + i * 32) });
+        try composer.append(.{ .wave = c3_melody, .start_point = spb(bpm, sample_rate) * (28 + i * 32) });
+        try composer.append(.{ .wave = c3_melody_decayed, .start_point = spb(bpm, sample_rate) * (30 + i * 32) });
+    }
 
     return try composer.finalize(.{});
 }
