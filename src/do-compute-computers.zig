@@ -44,7 +44,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         .{ .code = .a, .octave = 2 },
         sample_rate,
         channels,
-        0.125,
+        volume * 0.125,
     );
     defer a2_major.deinit();
 
@@ -55,7 +55,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         .{ .code = .b, .octave = 2 },
         sample_rate,
         channels,
-        0.125,
+        volume * 0.125,
     );
     defer b2_major.deinit();
 
@@ -66,7 +66,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         .{ .code = .c, .octave = 3 },
         sample_rate,
         channels,
-        0.125,
+        volume * 0.125,
     );
     defer c3_major.deinit();
 
@@ -77,7 +77,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         .{ .code = .d, .octave = 3 },
         sample_rate,
         channels,
-        0.125,
+        volume * 0.125,
     );
     defer d3_major.deinit();
 
@@ -88,7 +88,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         .{ .code = .e, .octave = 3 },
         sample_rate,
         channels,
-        0.125,
+        volume * 0.125,
     );
     defer e3_major.deinit();
 
@@ -99,7 +99,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         .{ .code = .g, .octave = 3 },
         sample_rate,
         channels,
-        0.125,
+        volume * 0.125,
     );
     defer g3_major.deinit();
 
@@ -110,7 +110,7 @@ pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
         .{ .code = .ds, .octave = 3 },
         sample_rate,
         channels,
-        0.125,
+        volume * 0.125,
     );
     defer ds3_minor.deinit();
 
