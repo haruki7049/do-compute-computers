@@ -1,6 +1,6 @@
 .{
     .name = .do_compute_computers,
-    .version = "0.0.0",
+    .version = "0.1.0-alpha.0",
     .fingerprint = 0xcceeb1ca5db26643,
     .minimum_zig_version = "0.15.2",
 
