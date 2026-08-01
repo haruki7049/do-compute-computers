@@ -4,8 +4,6 @@ const l = @import("lightmix");
 const formats: []const l.WavOptions = &.{
     .{ .bits = 24, .format_code = .pcm, .name = "do-compute-computers_24bit-PCM.wav" },
     .{ .bits = 32, .format_code = .pcm, .name = "do-compute-computers_32bit-PCM.wav" },
-    .{ .bits = 32, .format_code = .ieee_float, .name = "do-compute-computers_32bit-IEEEFloat.wav" },
-    .{ .bits = 64, .format_code = .ieee_float, .name = "do-compute-computers_64bit-IEEEFloat.wav" },
 };
 
 fn build_waves(b: *std.Build, mod: *std.Build.Module) !void {
