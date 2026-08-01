@@ -1,7 +1,23 @@
 const std = @import("std");
 const l = @import("lightmix");
 
-pub fn build(b: *std.Build) anyerror!void {
+const formats: []const l.WavOptions = &.{
+    .{ .bits = 24, .format_code = .pcm, .name = "do-compute-computers_24bit-PCM.wav" },
+    .{ .bits = 32, .format_code = .pcm, .name = "do-compute-computers_32bit-PCM.wav" },
+    .{ .bits = 32, .format_code = .ieee_float, .name = "do-compute-computers_32bit-IEEEFloat.wav" },
+    .{ .bits = 64, .format_code = .ieee_float, .name = "do-compute-computers_64bit-IEEEFloat.wav" },
+};
+
+fn build_waves(b: *std.Build, mod: *std.Build.Module) !void {
+    inline for (formats) |wav_format| {
+        const wave = try l.addWave(b, mod, .{
+            .format = .{ .wav = wav_format },
+        });
+        l.installWave(b, wave);
+    }
+}
+
+pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
@@ -34,10 +50,12 @@ pub fn build(b: *std.Build) anyerror!void {
     b.installArtifact(lib);
 
     // Wave Install
+    try build_waves(b, mod);
     const wave = try l.addWave(b, mod, .{
         .format = .{ .wav = .{
             .bits = 16,
             .format_code = .pcm,
+            .name = "do-compute-computers_16bit-PCM.wav",
         } },
     });
     l.installWave(b, wave);
