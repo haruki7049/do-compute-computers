@@ -7,7 +7,9 @@ const Scale = @import("./scale.zig");
 const Splitter = @import("./splitter.zig");
 const Filters = @import("./filters.zig");
 
-pub fn gen(allocator: std.mem.Allocator) !lightmix.Wave(f64) {
+pub fn gen(init: std.process.Init) !lightmix.Wave(f64) {
+    const allocator: std.mem.Allocator = init.arena.allocator();
+
     const bpm = 180;
     const sample_rate = 44100;
     const channels = 1;

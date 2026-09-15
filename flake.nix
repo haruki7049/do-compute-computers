@@ -1,7 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    systems.url = "github:nix-systems/default";
     flake-compat.url = "github:edolstra/flake-compat";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
@@ -16,7 +15,12 @@
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import inputs.systems;
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
+
       imports = [
         inputs.treefmt-nix.flakeModule
       ];
@@ -24,7 +28,8 @@
       perSystem =
         { pkgs, lib, ... }:
         let
-          buildInputs = lib.optionals pkgs.stdenv.isLinux [
+          ZIG = pkgs.zig_0_16;
+          buildInputs = lib.optionals pkgs.stdenv.hostPlatform.isLinux [
             pkgs.alsa-lib
             pkgs.pulseaudio
             pkgs.pipewire
@@ -37,12 +42,12 @@
 
             inherit buildInputs;
             nativeBuildInputs = [
-              pkgs.zig_0_15.hook
+              ZIG.hook
               pkgs.pkg-config
             ];
 
             postPatch = ''
-              ln -s ${pkgs.callPackage ./.deps.nix { }} $ZIG_GLOBAL_CACHE_DIR/p
+              ln -s ${pkgs.callPackage ./.deps.nix { }} zig-pkg
 
               # Remove NIX_CFLAGS_COMPILE because zig cannot understand it
               unset NIX_CFLAGS_COMPILE
@@ -58,7 +63,7 @@
 
             # Zig
             programs.zig.enable = true;
-            settings.formatter.zig.command = lib.getExe pkgs.zig_0_15;
+            settings.formatter.zig.command = lib.getExe ZIG;
 
             # GitHub Actions
             programs.actionlint.enable = true;
@@ -81,7 +86,7 @@
             inherit buildInputs;
             nativeBuildInputs = [
               # Compiler
-              pkgs.zig_0_15
+              ZIG
               pkgs.pkg-config
 
               # LSP
