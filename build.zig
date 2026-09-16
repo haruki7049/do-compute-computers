@@ -6,9 +6,10 @@ const formats: []const l.WavOptions = &.{
     .{ .bits = 32, .format_code = .pcm, .name = "do-compute-computers_32bit-PCM.wav" },
 };
 
-fn build_waves(b: *std.Build, mod: *std.Build.Module) !void {
+fn build_waves(b: *std.Build, mod: *std.Build.Module, optimize: std.builtin.OptimizeMode) !void {
     inline for (formats) |wav_format| {
         const wave = try l.addWave(b, mod, .{
+            .optimize = optimize,
             .format = .{ .wav = wav_format },
         });
         l.installWave(b, wave);
@@ -48,8 +49,9 @@ pub fn build(b: *std.Build) !void {
     b.installArtifact(lib);
 
     // Wave Install
-    try build_waves(b, mod);
+    try build_waves(b, mod, optimize);
     const wave = try l.addWave(b, mod, .{
+        .optimize = optimize,
         .format = .{ .wav = .{
             .bits = 16,
             .format_code = .pcm,
